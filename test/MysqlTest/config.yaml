@@ -1,0 +1,11 @@
+db:
+  host: 192.168.2.50 # 数据库主机地址
+  port: 3306                 # 数据库端口号
+  username: FileManager      # 数据库用户名
+  password: Project233! # 数据库密码
+  database: file             # 数据库名称
+  parameters:
+    charset: utf8mb4         # 数据库编码
+    parseTime: true          # 自动解析时间戳
+    loc: Local               # 本地时区
+
