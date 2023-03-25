@@ -23,7 +23,7 @@ type Config struct {
 
 func main() {
 	// 读取配置文件
-	configFile, err := ioutil.ReadFile("config.yaml")
+	configFile, err := ioutil.ReadFile("test/MysqlTest/config.yaml")
 	if err != nil {
 		log.Fatalf("failed to read config file: %v", err)
 	}
