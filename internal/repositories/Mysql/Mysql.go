@@ -1,8 +1,10 @@
 package mysql
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"sync"
 
 	"gopkg.in/yaml.v2"
@@ -30,8 +32,9 @@ var (
 
 func GetDB() *gorm.DB {
 	once.Do(func() {
+
 		// 连接数据库
-		configFile, err := ioutil.ReadFile("test/MysqlTest/test.yaml")
+		configFile, err := ioutil.ReadFile("test/MysqlTest/config.yaml")
 		if err != nil {
 			log.Fatalf("failed to read config file: %v", err)
 		}
@@ -43,12 +46,11 @@ func GetDB() *gorm.DB {
 		}
 
 		// 构建数据库连接字符串
-		dsn :=  config.DB.Username + ":" + config.DB.Password + "@tcp(" +
-			config.DB.Host + ":" + config.DB.Port + ")/" +
-			config.DB.Database + "?"
+		params := url.Values{}
 		for k, v := range config.DB.Parameters {
-			dsn += k + "=" + v + "&"
+			params.Set(k, v)
 		}
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?%s", config.DB.Username, config.DB.Password, config.DB.Host, config.DB.Port, config.DB.Database, params.Encode())
 
 		// 连接数据库
 		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
