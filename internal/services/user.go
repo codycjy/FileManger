@@ -6,16 +6,20 @@ import (
 )
 
 
-func RegisterUser(user model.User) (model.User,error){
+func RegisterUser(user *model.User) (error){
 	db:=mysql.GetDB()
 	err:=db.Create(&user).Error
-	return user,err
+	return err
 }
 
-func LoginUser(user model.User) (model.User,error){
+func LoginUser(user *model.User) (error){
 	db:=mysql.GetDB()
-	var u model.User
-	err:=db.Where("username=? and password=?",user.Username,user.Password).First(&u).Error
-	return u,err
+	err:=db.Where("username=? and password=?",user.Username,user.Password).First(&user).Error
+	return err
 }
 
+func GetUserById(user *model.User) (error){
+	db:=mysql.GetDB()
+	err:=db.Where("id=?",user.Model.ID).First(&user).Error
+	return err
+}
