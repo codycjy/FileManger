@@ -1,19 +1,22 @@
 package fileapi
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
-func GetFile(c *gin.Context){
-
-}
-
-func AddFile(c *gin.Context){
-
-}
-
-func UpdateFile(c *gin.Context){
+func DownloadFile(c *gin.Context) {
+	// id := c.Param("id")
 
 }
 
-func DeleteFile(c *gin.Context){
+func UploadFile(c *gin.Context) {
+
+}
+
+func UpdateFile(c *gin.Context) {
+
+}
+
+func DeleteFile(c *gin.Context) {
 
 }

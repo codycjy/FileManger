@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	model "filemanger/internal/models"
+	mysql "filemanger/internal/repositories/Mysql"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,8 +13,12 @@ import (
 func getUserFromDB(userID int) *model.User {
 	// TODO: Finish this function
 	// NOTE: Use redis to cache user info
-	return &model.User{}
+	db:=mysql.GetDB()
+	user:=model.User{}
+	db.First(&user,userID)
+	return &user
 }
+
 func Authorization(allowedLevels ...int) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Step 2: Extract authentication information (e.g., a JWT token or session ID)
