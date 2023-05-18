@@ -1,8 +1,8 @@
 package middlewares
 
 import (
-	model "filemanger/internal/models"
-	mysql "filemanger/internal/repositories/Mysql"
+	"filemanger/internal/models"
+	"filemanger/internal/repositories/mysql"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,12 +10,12 @@ import (
 
 // finish a jwt middleware
 
-func getUserFromDB(userID int) *model.User {
+func getUserFromDB(userID int) *models.User {
 	// TODO: Finish this function
 	// NOTE: Use redis to cache user info
-	db:=mysql.GetDB()
-	user:=model.User{}
-	db.First(&user,userID)
+	db := mysql.GetDB()
+	user := models.User{}
+	db.First(&user, userID)
 	return &user
 }
 

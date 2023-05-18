@@ -2,12 +2,12 @@ package main
 
 import (
 	"filemanger/internal/api"
-	model "filemanger/internal/models"
-	mysql "filemanger/internal/repositories/Mysql"
+	"filemanger/internal/models"
+	"filemanger/internal/repositories/mysql"
 )
 
-func main(){
-	db:=mysql.GetDB()
-	db.AutoMigrate(&model.User{},&model.File{},&model.Folder{})
+func main() {
+	db := mysql.GetDB()
+	db.AutoMigrate(&models.User{}, &models.File{}, &models.Folder{})
 	api.Router()
 }

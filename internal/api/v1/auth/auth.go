@@ -18,7 +18,7 @@ type LoginResponse struct {
 }
 
 func LoginHandler(c *gin.Context) {
-	var req LoginRequest
+	var req LoginRequest // TODO: replace it with user model
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

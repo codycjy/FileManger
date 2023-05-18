@@ -1,4 +1,4 @@
-package model
+package models
 
 import "gorm.io/gorm"
 
@@ -19,6 +19,26 @@ type File struct {
 	Folders  []Folder `gorm:"many2many:folder_files;"`
 }
 
+func (f File) GetSize() int64 {
+	return f.Size
+}
+
+func (f File) GetID() uint {
+	return f.ID
+}
+
+func (f File) GetName() string {
+	return f.FileName
+}
+
+func (f File) GetPath() string {
+	return f.Path
+}
+
+func (f File) IsFolder() bool {
+	return false
+}
+
 type Folder struct {
 	gorm.Model
 	Name     string
@@ -29,48 +49,30 @@ type Folder struct {
 	Children []*Folder `gorm:"foreignkey:ParentID"`
 	Files    []File    `gorm:"many2many:folder_files;"`
 }
-func (f *File) GetSize() int64 {
-    return f.Size
-}
-
-func (f *File) GetID() uint {
-    return f.ID
-}
-
-func (f *File) GetName() string {
-    return f.FileName
-}
-
-func (f *File) GetPath() string {
-    return f.Path
-}
-
-func (f *File) IsFolder() bool {
-	return false
-}
 
 func (f *Folder) GetSize() int64 {
-    var size int64
-    for _, child := range f.Children {
-        size += child.GetSize()
-    }
-    for _, file := range f.Files {
-        size += file.Size
-    }
-    return size
+	var size int64
+	for _, child := range f.Children {
+		size += child.GetSize()
+	}
+	for _, file := range f.Files {
+		size += file.Size
+	}
+	return size
 }
 
-func (f *Folder) GetID() uint {
-    return f.ID
+func (f Folder) GetID() uint {
+	return f.ID
 }
 
 func (f *Folder) GetName() string {
-    return f.Name
+	return f.Name
 }
 
 func (f *Folder) GetPath() string {
-    return f.Path
+	return f.Path
 }
+
 func (f *Folder) IsFolder() bool {
 	return true
 }
