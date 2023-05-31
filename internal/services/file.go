@@ -46,3 +46,17 @@ func AddContent(content models.Content) error {
 	}
 	return nil
 }
+
+func GetFolderByID(id uint) (*models.Folder, error) {
+	return repositories.GetFolderByID(id)
+}
+
+func DownloadFile(id uint) (*models.File, error) {
+	file,err:=repositories.GetFileByID(id)
+	if err!=nil{
+		return nil,err
+	}
+	return file,nil
+
+
+}

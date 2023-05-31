@@ -15,27 +15,28 @@ func GetFileByID(id uint) (*models.File, error) {
 }
 
 func GetFolderByID(id uint) (*models.Folder, error) {
-	var folder models.Folder
-	db := mysql.GetDB()
-	if err := db.First(&folder, id).Error; err != nil {
-		return nil, err
-	}
-	return &folder, nil
-}
-func CreateFile(file *models.File) error {
+    var folder models.Folder
     db := mysql.GetDB()
-    if err := db.Create(file).Error; err != nil {
-        return err
+    if err := db.Preload("Files").Preload("Children").First(&folder, id).Error; err != nil {
+        return nil, err
     }
-    return nil
+    return &folder, nil
+}
+
+func CreateFile(file *models.File) error {
+	db := mysql.GetDB()
+	if err := db.Create(file).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func CreateFolder(folder *models.Folder) error {
-    db := mysql.GetDB()
-    if err := db.Create(folder).Error; err != nil {
-        return err
-    }
-    return nil
+	db := mysql.GetDB()
+	if err := db.Create(folder).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func DeleteFileByID(id uint) error {
@@ -45,6 +46,7 @@ func DeleteFileByID(id uint) error {
 	}
 	return nil
 }
+
 func DeleteFolderByID(id uint) error {
 	db := mysql.GetDB()
 
