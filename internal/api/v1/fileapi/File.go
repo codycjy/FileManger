@@ -36,6 +36,32 @@ func DeleteFile(c *gin.Context) {
 
 }
 
+type createFolderRequest struct {
+	name string
+	folder models.Folder
+	user models.User
+
+}
+func CreateFolder(c *gin.Context) {
+	var reqFolder createFolderRequest
+
+	err:=c.ShouldBindJSON(&reqFolder)
+	if err!=nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+		return
+	}
+	err=services.CreateFolder(&reqFolder.folder,&reqFolder.user)
+	if err!=nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		return
+	}
+	c.JSON(200,gin.H{
+		"status":0,
+		"folder":reqFolder.folder,
+	})
+
+}
+
 func GetFolderByID(c *gin.Context) {
 	var reqFolder models.Folder
 	err:=c.ShouldBindJSON(&reqFolder)

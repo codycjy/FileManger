@@ -11,12 +11,23 @@ type Content interface {
 }
 
 type File struct {
-	gorm.Model
-	FileName string
-	Path     string
-	Size     int64
-	UserID   uint
-	Folders  []Folder `gorm:"many2many:folder_files;"`
+    gorm.Model
+    FileName  string
+    Path      string
+    Size      int64
+    UserID    uint
+    FolderID  uint
+}
+
+type Folder struct {
+    gorm.Model
+    Name      string
+    Path      string
+    Size      int64
+    UserID    uint  
+	ParentID  *uint
+    Children  []*Folder `gorm:"foreignkey:ParentID"`
+    Files     []File    `gorm:"foreignKey:FolderID"`
 }
 
 func (f File) GetSize() int64 {
@@ -39,16 +50,7 @@ func (f File) IsFolder() bool {
 	return false
 }
 
-type Folder struct {
-	gorm.Model
-	Name     string
-	Path     string
-	Size     int64
-	UserID   uint
-	ParentID *uint
-	Children []*Folder `gorm:"foreignkey:ParentID"`
-	Files    []File    `gorm:"many2many:folder_files;"`
-}
+
 
 func (f *Folder) GetSize() int64 {
 	var size int64

@@ -4,6 +4,9 @@ import (
 	"errors"
 	"filemanger/internal/models"
 	"filemanger/internal/repositories"
+	"filemanger/internal/repositories/mysql"
+
+	"gorm.io/gorm"
 )
 
 func GetContentInfo(content *models.Content) models.Content {
@@ -59,4 +62,26 @@ func DownloadFile(id uint) (*models.File, error) {
 	return file,nil
 
 
+}
+
+func CreateFolder(folder *models.Folder, user *models.User) error {
+    err := GetUserById(user)
+    if err != nil {
+        return err
+    }
+    user.Folders = append(user.Folders, *folder)
+    db := mysql.GetDB()
+    err = db.Transaction(func(tx *gorm.DB) error {
+        if err := tx.Save(user).Error; err != nil {
+            return err
+        }
+        if err := tx.Create(folder).Error; err != nil {
+            return err
+        }
+        return nil
+    })
+    if err != nil {
+        return err
+    }
+    return nil
 }
