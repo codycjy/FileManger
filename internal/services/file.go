@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"filemanger/internal/constants"
 	"filemanger/internal/models"
 	"filemanger/internal/repositories"
 	"filemanger/internal/repositories/mysql"
@@ -55,33 +56,45 @@ func GetFolderByID(id uint) (*models.Folder, error) {
 }
 
 func DownloadFile(id uint) (*models.File, error) {
-	file,err:=repositories.GetFileByID(id)
-	if err!=nil{
-		return nil,err
+	file, err := repositories.GetFileByID(id)
+	if err != nil {
+		return nil, err
 	}
-	return file,nil
-
-
+	return file, nil
 }
 
 func CreateFolder(folder *models.Folder, user *models.User) error {
-    err := GetUserById(user)
-    if err != nil {
-        return err
-    }
-    user.Folders = append(user.Folders, *folder)
-    db := mysql.GetDB()
-    err = db.Transaction(func(tx *gorm.DB) error {
-        if err := tx.Save(user).Error; err != nil {
-            return err
-        }
-        if err := tx.Create(folder).Error; err != nil {
-            return err
-        }
-        return nil
-    })
-    if err != nil {
-        return err
-    }
-    return nil
+	err := GetUserById(user, constants.Folder)
+	if err != nil {
+		return err
+	}
+	user.Folders = append(user.Folders, *folder)
+	db := mysql.GetDB()
+	err = db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Save(user).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UploadFile(file *models.File,user *models.User) error{
+	err:=GetUserById(user,constants.File)	
+	if err!=nil{
+		return err
+	}
+
+	user.Files=append(user.Files,*file)
+	db:=mysql.GetDB()
+	err=db.Transaction(func(tx *gorm.DB)error{
+		if err:=tx.Save(user).Error;err!=nil{
+			return err
+		}
+		return nil
+	})
+	return err
 }
