@@ -12,20 +12,20 @@ type Content interface {
 
 type File struct {
     gorm.Model
-    FileName  string
-    Path      string
-    Size      int64
-    UserID    uint
-    FolderID  uint
+	FileName  string `json:"filename"`
+    Path      string `json:"path"`
+    Size      int64 `json:"size"`
+    UserID    uint `json:"user_id"`
+    FolderID  uint `json:"folder_id"`
 }
 
 type Folder struct {
     gorm.Model
-    Name      string
-    Path      string
-    Size      int64
-    UserID    uint  
-	ParentID  *uint
+    Name      string `json:"name"`
+    Path      string `json:"path"`
+    Size      int64 `json:"size"`
+    UserID    uint  `json:"user_id"`
+	ParentID  *uint `json:"parent_id"`
     Children  []*Folder `gorm:"foreignkey:ParentID"`
     Files     []File    `gorm:"foreignKey:FolderID"`
 }
