@@ -22,7 +22,18 @@ func GetUser(c *gin.Context) {
 }
 
 func AddUser(c *gin.Context) {
-
+    var user models.User
+    err := c.ShouldBind(&user)
+    if err!=nil{
+        c.JSON(http.StatusBadRequest,gin.H{"status":1,"error":err})
+        return
+    }
+    err = services.AddUser(&user)
+    if err!=nil{
+        c.JSON(http.StatusBadRequest,gin.H{"status":1,"error":err})
+        return
+    }
+    c.JSON(http.StatusOK,gin.H{"status":0,"data":user})
 }
 
 type UpdateUserRequest struct {
