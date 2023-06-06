@@ -68,9 +68,12 @@ func CreateFolder(folder *models.Folder, user *models.User) error {
 	if err != nil {
 		return err
 	}
-	user.Folders = append(user.Folders, *folder)
 	db := mysql.GetDB()
 	err = db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Save(folder).Error; err != nil {
+			return err
+		}
+		user.Folders = append(user.Folders, *folder)
 		if err := tx.Save(user).Error; err != nil {
 			return err
 		}
@@ -82,16 +85,19 @@ func CreateFolder(folder *models.Folder, user *models.User) error {
 	return nil
 }
 
-func UploadFile(file *models.File,user *models.User) error{
-	err:=GetUserById(user,constants.File)	
-	if err!=nil{
+func UploadFile(file *models.File, user *models.User) error {
+	err := GetUserById(user, constants.File)
+	if err != nil {
 		return err
 	}
 
-	user.Files=append(user.Files,*file)
-	db:=mysql.GetDB()
-	err=db.Transaction(func(tx *gorm.DB)error{
-		if err:=tx.Save(user).Error;err!=nil{
+	db := mysql.GetDB()
+	err = db.Transaction(func(tx *gorm.DB) error {
+		if err:=tx.Save(file).Error;err!=nil{
+			return err
+		}
+		user.Files = append(user.Files, *file)
+		if err := tx.Save(user).Error; err != nil {
 			return err
 		}
 		return nil
