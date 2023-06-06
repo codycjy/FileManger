@@ -1,10 +1,9 @@
 package main
 
 import (
-	mysql "filemanger/internal/repositories/Mysql"
+	"filemanger/internal/models"
+	"filemanger/internal/repositories/mysql"
 	"fmt"
-
-	"gorm.io/gorm"
 )
 
 type Content interface {
@@ -12,39 +11,13 @@ type Content interface {
 	GetID() uint
 }
 
-type File struct {
-	gorm.Model
-	FileName string
-	Path     string
-	Size     int64
-	UserID   uint
-	Folders  []Folder `gorm:"many2many:folder_files;"`
-}
-
-type Folder struct {
-	gorm.Model
-	Name     string
-	Path     string
-	Size     int64
-	UserID   uint
-	ParentID *uint
-	Children []*Folder `gorm:"foreignkey:ParentID"`
-	Files    []File    `gorm:"many2many:folder_files;"`
-}
-
-type User struct {
-	gorm.Model
-	Username string
-	Password string
-	Level    int
-	Files    []File `gorm:"many2many:user_files;"`
-	Folders  []Folder `gorm:"many2many:user_folders;"`
-}
-
+type User models.User
+type File models.File
+type Folder models.Folder
 func main() {
 	// Implement GORM connection and initialization
 	db:=mysql.GetDB()
-	db.AutoMigrate(&User{}, &File{}, &Folder{},)
+	db.AutoMigrate(&models.User{}, &models.File{}, &models.Folder{},)
 
 	// Create a user
 	user := User{
@@ -80,11 +53,13 @@ func main() {
 		Path:     "/Root/Nested/testfile.txt",
 		Size:     1024,
 		UserID:   user.ID,
-		Folders:  []Folder{nestedFolder},
+		FolderID: nestedFolder.ID,
 	}
 
 	db.Create(&file)
-
+// Add the file to the user's Files field
+	user.Files = append(user.Files, models.File(file))
+	db.Save(&user)
 	// Query the database and print the results
 	var folders []Folder
 	db.Preload("Children").Preload("Children.Files").Where("user_id = ?", user.ID).Where("parent_id IS NULL").Find(&folders)

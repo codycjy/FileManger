@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func DownloadFile(c *gin.Context) {
@@ -24,7 +25,27 @@ func DownloadFile(c *gin.Context) {
     c.File(file.Path)
 }
 
+type uploadFileRequest struct {
+	File models.File `json:"file" binding:"required"`
+	User models.User `json:"user" binding:"required"`
+}
+
 func UploadFile(c *gin.Context) {
+	var reqFile uploadFileRequest
+	err:=c.ShouldBindJSON(&reqFile)
+	if err!=nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+		return
+	}
+	err=services.UploadFile(&reqFile.File,&reqFile.User)
+	if err!=nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		return
+	}
+	c.JSON(200,gin.H{
+		"status":0,
+	})
+
 
 }
 
@@ -36,15 +57,45 @@ func DeleteFile(c *gin.Context) {
 
 }
 
-func GetFolderByID(c *gin.Context) {
-	var reqFolder models.Folder
+type createFolderRequest struct {
+	Folder models.Folder `json:"folder" binding:"required"`
+	User models.User `json:"user" binding:"required"`
+
+}
+func CreateFolder(c *gin.Context) {
+	var reqFolder createFolderRequest
+
 	err:=c.ShouldBindJSON(&reqFolder)
 	if err!=nil{
-		c.JSON(400,gin.H{"error":err.Error()})
+		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
 		return
+	}
+	err=services.CreateFolder(&reqFolder.Folder,&reqFolder.User)
+	if err!=nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		return
+	}
+	c.JSON(200,gin.H{
+		"status":0,
+		"folder":reqFolder.Folder,
+	})
+
+}
+
+func GetFolderByID(c *gin.Context) {
+	id:=c.Param("id")
+	num,_:=strconv.ParseUint(id, 10, 64)
+	reqFolder:=models.Folder{
+		Model:gorm.Model{
+			ID:uint(num),
+		},
 	}
 	folder,err:=services.GetFolderByID(reqFolder.ID)
 	// TODO: return a list of files and folders
+	if err!=nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		return
+	}
 	c.JSON(200, gin.H{
 		"status": 0,
 		"folder": folder,
