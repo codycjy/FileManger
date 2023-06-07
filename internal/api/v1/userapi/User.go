@@ -4,6 +4,7 @@ import (
 	"filemanger/internal/models"
 	"filemanger/internal/services"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,12 +24,21 @@ func GetUser(c *gin.Context) {
 
 func AddUser(c *gin.Context) {
     var user models.User
+    var folder models.Folder
     err := c.ShouldBind(&user)
     if err!=nil{
         c.JSON(http.StatusBadRequest,gin.H{"status":1,"error":err})
         return
     }
     err = services.AddUser(&user)
+    if err!=nil{
+        c.JSON(http.StatusBadRequest,gin.H{"status":1,"error":err})
+        return
+    }
+    folder.Name = strconv.FormatUint(uint64(user.ID), 10)
+    folder.UserID = user.ID
+    folder.Path = "/"+strconv.FormatUint(uint64(user.ID), 10)
+    err = services.CreateFolder(&folder,&user)
     if err!=nil{
         c.JSON(http.StatusBadRequest,gin.H{"status":1,"error":err})
         return
