@@ -17,7 +17,7 @@ func Router() {
 		authRouter.POST("/login", auth.LoginHandler)
 		authRouter.POST("/logout", auth.LogoutHandler)
 
-		// v1.Use(auth.AuthMiddleware())
+		v1.Use(auth.AuthMiddleware())
 		userGroup := v1.Group("/users")
 		{
 			userGroup.GET("/:id", userapi.GetUser)
