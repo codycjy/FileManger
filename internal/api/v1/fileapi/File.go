@@ -1,6 +1,7 @@
 package fileapi
 
 import (
+	"filemanger/internal/config"
 	"filemanger/internal/models"
 	"filemanger/internal/services"
 	"net/http"
@@ -32,8 +33,22 @@ type uploadFileRequest struct {
 
 func UploadFile(c *gin.Context) {
 	var reqFile uploadFileRequest
-	err:=c.ShouldBindJSON(&reqFile)
-	if err!=nil{
+    file,err := c.FormFile("fileupload")
+    userid,err:=strconv.ParseUint(c.PostForm("userid"), 10, 64)
+    folderid,err:=strconv.ParseUint(c.PostForm("folderid"), 10, 64)
+    path:=c.PostForm("path")
+    if err != nil {
+        c.AbortWithError(http.StatusBadRequest, err)
+        return
+    }
+    reqFile.File.FileName = file.Filename
+    reqFile.File.Size = file.Size
+    reqFile.File.Path = path+"/"+file.Filename
+    reqFile.File.UserID = uint(userid)
+    reqFile.File.FolderID = uint(folderid)
+    reqFile.User.ID = uint(userid)
+    c.SaveUploadedFile(file,config.STORE_PATH+path+"/"+file.Filename)
+    if err!=nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
 		return
 	}
@@ -48,7 +63,6 @@ func UploadFile(c *gin.Context) {
 
 
 }
-
 func UpdateFile(c *gin.Context) {
 
 }
