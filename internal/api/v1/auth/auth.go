@@ -3,7 +3,6 @@ package auth
 import (
 	"filemanger/internal/models"
 	"filemanger/internal/repositories"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -30,7 +29,6 @@ func LoginHandler(c *gin.Context) {
 	// TODO: Validate the username and password
 	// ...Validate 
     err := repositories.LoginUser(&req)
-    fmt.Println(req.ID)
     if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "wrong username or password"})
         return
