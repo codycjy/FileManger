@@ -4,6 +4,7 @@ import (
 	"filemanger/internal/config"
 	"filemanger/internal/models"
 	"filemanger/internal/services"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -12,18 +13,20 @@ import (
 )
 
 func DownloadFile(c *gin.Context) {
-    idStr := c.Param("id")
-    id, err := strconv.ParseUint(idStr, 10, 64)
-    if err != nil {
-        c.AbortWithError(http.StatusBadRequest, err)
-        return
-    }
-    file, err := services.DownloadFile(uint(id))
-    if err != nil {
-        c.AbortWithError(http.StatusInternalServerError, err)
-        return
-    }
-    c.File(file.Path)
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	var file models.File
+	file.ID = uint(id)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	err = services.DownloadFile(&file)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.File(file.Path)
 }
 
 type uploadFileRequest struct {
@@ -33,22 +36,22 @@ type uploadFileRequest struct {
 
 func UploadFile(c *gin.Context) {
 	var reqFile uploadFileRequest
-    file,err := c.FormFile("fileupload")
-    userid,err:=strconv.ParseUint(c.PostForm("userid"), 10, 64)
-    folderid,err:=strconv.ParseUint(c.PostForm("folderid"), 10, 64)
-    path:=c.PostForm("path")
-    if err != nil {
-        c.AbortWithError(http.StatusBadRequest, err)
-        return
-    }
-    reqFile.File.FileName = file.Filename
-    reqFile.File.Size = file.Size
-    reqFile.File.Path = path+"/"+file.Filename
-    reqFile.File.UserID = uint(userid)
-    reqFile.File.FolderID = uint(folderid)
-    reqFile.User.ID = uint(userid)
-    c.SaveUploadedFile(file,config.STORE_PATH+path+"/"+file.Filename)
-    if err!=nil{
+	file,err := c.FormFile("fileupload")
+	userid,err:=strconv.ParseUint(c.PostForm("userid"), 10, 64)
+	folderid,err:=strconv.ParseUint(c.PostForm("folderid"), 10, 64)
+	path:=c.PostForm("path")
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	reqFile.File.FileName = file.Filename
+	reqFile.File.Size = file.Size
+	reqFile.File.Path = path+"/"+file.Filename
+	reqFile.File.UserID = uint(userid)
+	reqFile.File.FolderID = uint(folderid)
+	reqFile.User.ID = uint(userid)
+	c.SaveUploadedFile(file,config.STORE_PATH+path+"/"+file.Filename)
+	if err!=nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
 		return
 	}
@@ -118,4 +121,30 @@ func GetFolderByID(c *gin.Context) {
 
 
 
+func ShareFile(c *gin.Context) {
+	var reqFile models.File
+	c.ShouldBindJSON(&reqFile)
+	c.JSON(200, gin.H{
+		"status": 0,
+		"url": fmt.Sprintf("/api/v1/public/%d", reqFile.ID),
+	})
+
+}
+
+func GetPublicFile(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	var file models.File
+	file.ID = uint(id)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	err = services.DownloadFile(&file)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.File(file.Path)
+}
 

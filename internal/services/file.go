@@ -55,12 +55,13 @@ func GetFolderByID(id uint) (*models.Folder, error) {
 	return repositories.GetFolderByID(id)
 }
 
-func DownloadFile(id uint) (*models.File, error) {
-	file, err := repositories.GetFileByID(id)
+func DownloadFile(file *models.File) ( error) {
+	db:=mysql.GetDB()
+	err:=db.Model(file).First(file).Error
 	if err != nil {
-		return nil, err
+		return  err
 	}
-	return file, nil
+	return  nil
 }
 
 func CreateFolder(folder *models.Folder, user *models.User) error {
