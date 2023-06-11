@@ -104,3 +104,39 @@ func UploadFile(file *models.File, user *models.User) error {
 	})
 	return err
 }
+
+
+func DeleteFolder(folder *models.Folder) error {
+	db := mysql.GetDB()
+	err := db.Transaction(func(tx *gorm.DB) error {
+		for _,child:=range folder.Children{
+			if err:=DeleteFolder(child);err!=nil{
+				return err
+			}
+		}
+
+		for _, file := range folder.Files {
+			if err := tx.Delete(file).Error; err != nil {
+				return err
+			}
+		}
+
+		if err := tx.Delete(folder).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+	return err
+}
+
+func DeleteFile(file *models.File) error {
+	db := mysql.GetDB()
+	err := db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Delete(file).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+	return err
+}
+

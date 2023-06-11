@@ -68,6 +68,33 @@ func UpdateFile(c *gin.Context) {
 }
 
 func DeleteFile(c *gin.Context) {
+	var reqFile models.File
+	c.ShouldBindJSON(&reqFile)
+	err:=services.DeleteFile(&reqFile)
+
+	if err!=nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		return
+	}
+	
+	c.JSON(200,gin.H{
+		"status":0,
+	})
+
+}
+func DeleteFolder(c *gin.Context) {
+	var reqFolder models.Folder
+	c.ShouldBindJSON(&reqFolder)
+	err:=services.DeleteFolder(&reqFolder)
+
+	if err!=nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		return
+	}
+	
+	c.JSON(200,gin.H{
+		"status":0,
+	})
 
 }
 
