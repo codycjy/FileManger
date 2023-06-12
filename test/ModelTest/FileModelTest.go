@@ -4,6 +4,8 @@ import (
 	"filemanger/internal/models"
 	"filemanger/internal/repositories/mysql"
 	"fmt"
+
+	"gorm.io/gorm"
 )
 
 type Content interface {
@@ -14,9 +16,23 @@ type Content interface {
 type User models.User
 type File models.File
 type Folder models.Folder
+
+func dropTables(db *gorm.DB) {
+
+	var table=[]string{"user_folders","user_files","users","files","folders",}
+	for _,v:=range table{
+		db.Exec("DROP TABLE IF EXISTS "+v)
+	}
+
+}
+
 func main() {
 	// Implement GORM connection and initialization
 	db:=mysql.GetDB()
+
+	// Drop all tables
+	dropTables(db)
+
 	db.AutoMigrate(&models.User{}, &models.File{}, &models.Folder{},)
 
 	// Create a user
@@ -46,6 +62,8 @@ func main() {
 	}
 
 	db.Create(&nestedFolder)
+	user.Folders = append(user.Folders, models.Folder(rootFolder), models.Folder(nestedFolder))
+	db.Save(&user)
 
 	// Create a file inside the nested folder
 	file := File{
@@ -57,7 +75,7 @@ func main() {
 	}
 
 	db.Create(&file)
-// Add the file to the user's Files field
+	// Add the file to the user's Files field
 	user.Files = append(user.Files, models.File(file))
 	db.Save(&user)
 	// Query the database and print the results
