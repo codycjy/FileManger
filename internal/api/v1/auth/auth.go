@@ -29,7 +29,6 @@ func LoginHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
 	// ...Validate
 	err := repositories.LoginUser(&req)
 	if err != nil {
