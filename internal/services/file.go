@@ -154,3 +154,17 @@ func GetFolderByUserid(id uint) (*models.Folder, error) {
 	}
 	return &folder, nil
 }
+
+func SearchContent(keyword string,user *models.User)([]models.File,[]models.Folder,error){
+	// search file
+	var files []models.File
+	var folders []models.Folder
+	db:=mysql.GetDB()
+	if err:=db.Where("file_name LIKE ? AND user_id = ?",keyword+"%",user.ID).Find(&files).Error;err!=nil{
+		return nil,nil,err
+	}
+	if err:=db.Where("name LIKE ? AND user_id = ?",keyword+"%",user.ID).Find(&folders).Error;err!=nil{
+		return nil,nil,err
+	}
+	return files,folders,nil
+}

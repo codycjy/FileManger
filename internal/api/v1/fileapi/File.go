@@ -164,3 +164,27 @@ func GetFolderByID(c *gin.Context) {
 		"folder": folder,
 	})
 }
+
+type searchRequest struct {
+	Keyword string `json:"keyword" binding:"required"`
+	User    models.User `json:"user" binding:"required"`
+}
+func SearchContent(c *gin.Context){
+	var req searchRequest
+	err:=c.ShouldBindJSON(&req)
+	if err!=nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+		return
+	}
+	files,folders,err:=services.SearchContent(req.Keyword,&req.User)
+	if err!=nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+		return
+	}
+	c.JSON(200,gin.H{
+		"status":0,
+		"files":files,
+		"folders":folders,
+	})
+
+}
