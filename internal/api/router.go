@@ -31,7 +31,7 @@ func Router() {
 			fileGroup.GET("/:id", fileapi.DeleteFile) // WARN: Edit later
 			fileGroup.POST("/upload", fileapi.UploadFile)
 			fileGroup.DELETE("/:id", fileapi.DeleteFile)
-			fileGroup.POST("/file",fileapi.GetFolderByID)
+			fileGroup.POST("/file", fileapi.GetFolderByID)
 		}
 		folderGroup := v1.Group("/folders")
 		{

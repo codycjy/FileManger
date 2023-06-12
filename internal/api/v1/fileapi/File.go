@@ -61,7 +61,6 @@ func UploadFile(c *gin.Context) {
 		"status":0,
 	})
 
-
 }
 func UpdateFile(c *gin.Context) {
 
@@ -117,41 +116,47 @@ func DeleteFolder(c *gin.Context) {
 
 type createFolderRequest struct {
 	Folder models.Folder `json:"folder" binding:"required"`
-	User models.User `json:"user" binding:"required"`
-
+	User   models.User   `json:"user" binding:"required"`
 }
+
 func CreateFolder(c *gin.Context) {
 	var reqFolder createFolderRequest
 
-	err:=c.ShouldBindJSON(&reqFolder)
-	if err!=nil{
-		c.JSON(http.StatusBadRequest,gin.H{"error":err.Error()})
+	err := c.ShouldBindJSON(&reqFolder)
+	parentId := *reqFolder.Folder.ParentID
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err=services.CreateFolder(&reqFolder.Folder,&reqFolder.User)
-	if err!=nil{
-		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+	err = services.CreateFolder(&reqFolder.Folder, &reqFolder.User)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200,gin.H{
-		"status":0,
-		"folder":reqFolder.Folder,
+	currentFolder, err := services.GetFolderByID(parentId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{
+		"status": 0,
+		"folder": currentFolder,
 	})
 
 }
 
 func GetFolderByID(c *gin.Context) {
-	id:=c.Param("id")
-	num,_:=strconv.ParseUint(id, 10, 64)
-	reqFolder:=models.Folder{
-		Model:gorm.Model{
-			ID:uint(num),
+	id := c.Param("id")
+	num, _ := strconv.ParseUint(id, 10, 64)
+	reqFolder := models.Folder{
+		Model: gorm.Model{
+			ID: uint(num),
 		},
 	}
-	folder,err:=services.GetFolderByID(reqFolder.ID)
+	folder, err := services.GetFolderByID(reqFolder.ID)
 	// TODO: return a list of files and folders
-	if err!=nil{
-		c.JSON(http.StatusInternalServerError,gin.H{"error":err.Error()})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(200, gin.H{
@@ -159,7 +164,3 @@ func GetFolderByID(c *gin.Context) {
 		"folder": folder,
 	})
 }
-
-
-
-
