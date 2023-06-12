@@ -54,9 +54,11 @@ func GetDB() *gorm.DB {
 
 		// 连接数据库
 		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
-		if err != nil {
-			log.Fatalf("failed to connect database: %v", err)
-		}
+        //  enable debug mode
+        //db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{ })
+		//if err != nil {
+		//	log.Fatalf("failed to connect database: %v", err)
+		//}
 
 
 

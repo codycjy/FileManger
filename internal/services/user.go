@@ -37,3 +37,9 @@ func UpdateUser(user *models.User) error {
 	err := db.Save(&user).Error
 	return err
 }
+
+func AddUser(user *models.User) (error){
+    db:=mysql.GetDB()
+    err := db.Create(&user).Error
+    return err
+}

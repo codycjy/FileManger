@@ -77,3 +77,11 @@ func DeleteFolderByID(id uint) error {
 
 	return nil
 }
+
+func LoginUser(user *models.User) (error) {
+    db := mysql.GetDB()
+    if err := db.Where("username = ? AND password = ?", user.Username, user.Password).First(&user).Error; err != nil {
+        return err
+    }
+    return nil
+}
