@@ -13,7 +13,7 @@ func Router() {
 
 	v1 := r.Group("/api/v1")
 	{
-		authRouter := r.Group("/auth")
+		authRouter := v1.Group("/auth")
 		authRouter.POST("/login", auth.LoginHandler)
 		authRouter.POST("/logout", auth.LogoutHandler)
 
@@ -37,6 +37,7 @@ func Router() {
 		{
 			folderGroup.POST("/create",fileapi.CreateFolder)
 			folderGroup.GET("/:id",fileapi.GetFolderByID)
+			folderGroup.DELETE("/:id",fileapi.DeleteFolder)
 
 		}
 	}

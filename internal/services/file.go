@@ -108,16 +108,19 @@ func UploadFile(file *models.File, user *models.User) error {
 
 func DeleteFolder(folder *models.Folder) error {
 	db := mysql.GetDB()
+
+	db.Preload("Children").Preload("Files").First(folder)
 	err := db.Transaction(func(tx *gorm.DB) error {
+
 		for _,child:=range folder.Children{
 			if err:=DeleteFolder(child);err!=nil{
 				return err
 			}
 		}
 
-		for _, file := range folder.Files {
-			if err := tx.Delete(file).Error; err != nil {
-				return err
+		for _, file := range folder.Files{
+			if err := tx.Delete(&file).Error; err != nil {
+					return err
 			}
 		}
 
@@ -131,6 +134,7 @@ func DeleteFolder(folder *models.Folder) error {
 
 func DeleteFile(file *models.File) error {
 	db := mysql.GetDB()
+	db.First(file)
 	err := db.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Delete(file).Error; err != nil {
 			return err
