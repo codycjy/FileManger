@@ -6,6 +6,7 @@ import (
 	"filemanger/internal/models"
 	"filemanger/internal/repositories"
 	"filemanger/internal/repositories/mysql"
+	"strconv"
 
 	"gorm.io/gorm"
 )
@@ -93,7 +94,7 @@ func UploadFile(file *models.File, user *models.User) error {
 
 	db := mysql.GetDB()
 	err = db.Transaction(func(tx *gorm.DB) error {
-		if err:=tx.Save(file).Error;err!=nil{
+		if err := tx.Save(file).Error; err != nil {
 			return err
 		}
 		user.Files = append(user.Files, *file)
@@ -103,4 +104,14 @@ func UploadFile(file *models.File, user *models.User) error {
 		return nil
 	})
 	return err
+}
+
+func GetFolderByUserid(id uint) (*models.Folder, error) {
+	var folder models.Folder
+	db := mysql.GetDB()
+	path := "/" + strconv.FormatUint(uint64(id), 10)
+	if err := db.Preload("Files").Preload("Children").Where("path = ?", path).First(&folder).Error; err != nil {
+		return nil, err
+	}
+	return &folder, nil
 }
