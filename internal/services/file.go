@@ -168,3 +168,7 @@ func SearchContent(keyword string,user *models.User)([]models.File,[]models.Fold
 	}
 	return files,folders,nil
 }
+
+func ShareFile(file *models.File) string{
+	return "http://localhost:8080/api/v1/share/"+strconv.FormatUint(uint64(file.ID),10)
+}

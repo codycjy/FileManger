@@ -8,7 +8,7 @@ import (
 func GetFileByID(id uint) (*models.File, error) {
 	var file models.File
 	db := mysql.GetDB()
-	if err := db.Preload("Folders").First(&file, id).Error; err != nil {
+	if err := db.First(&file, id).Error; err != nil {
 		return nil, err
 	}
 	return &file, nil

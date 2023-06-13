@@ -17,6 +17,7 @@ func Router() {
 		authRouter.POST("/login", auth.LoginHandler)
 		authRouter.POST("/logout", auth.LogoutHandler)
 
+		v1.GET("/share/:id", fileapi.DownloadFile)
 		v1.Use(auth.AuthMiddleware())
 		userGroup := v1.Group("/users")
 		{
@@ -32,6 +33,7 @@ func Router() {
 			fileGroup.POST("/upload", fileapi.UploadFile)
 			fileGroup.DELETE("/:id", fileapi.DeleteFile)
 			fileGroup.POST("/file", fileapi.GetFolderByID)
+			fileGroup.POST("/share", fileapi.ShareFile)
 		}
 		folderGroup := v1.Group("/folders")
 		{

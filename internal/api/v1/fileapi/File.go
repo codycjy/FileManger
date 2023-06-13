@@ -23,7 +23,8 @@ func DownloadFile(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.File(file.Path)
+	path:=config.STORE_PATH+file.Path
+	c.File(path)
 }
 
 type uploadFileRequest struct {
@@ -187,4 +188,30 @@ func SearchContent(c *gin.Context){
 		"folders":folders,
 	})
 
+}
+
+func ShareFile(c *gin.Context){
+	var reqFile models.File
+	c.ShouldBindJSON(&reqFile)
+	res:=services.ShareFile(&reqFile)
+	c.JSON(200,gin.H{
+		"status":0,
+		"url":res,
+	})
+
+}
+
+func DownloadShareFile(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	file, err := services.DownloadFile(uint(id))
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.File(file.Path)
 }

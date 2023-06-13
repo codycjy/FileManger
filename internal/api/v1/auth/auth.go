@@ -29,7 +29,7 @@ func LoginHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	// ...Validate
+	// Validate
 	err := repositories.LoginUser(&req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "wrong username or password"})
@@ -48,6 +48,10 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 	folder, err = services.GetFolderByUserid(req.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, LoginResponse{Token: tokenString, User: req, Folder: *folder})
 }
 
