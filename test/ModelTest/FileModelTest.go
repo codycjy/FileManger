@@ -42,7 +42,7 @@ func main() {
 	// Create a root folder
 	rootFolder := Folder{
 		Name:   "Root",
-		Path:   "/",
+		Path:   "/1",
 		UserID: user.ID,
 	}
 
